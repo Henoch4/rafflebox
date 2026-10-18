@@ -1,261 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RaffleBox — Fair Raffles on BOT Chain</title>
-<style>
-:root{--bg:#0f0c06;--fg:#f7f0df;--mut:#ab9c7c;--line:#2b2413;--card:#171208;--acc:#f2b705;--acc2:#fbe3a2;--onacc:#241a02;--danger:#ef4444}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--fg);font-family:'Inter',system-ui,sans-serif;line-height:1.55;min-height:100vh}
-a{color:inherit;text-decoration:none}
-.mono{font-family:'Courier New',monospace}
-.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
-nav{border-bottom:1px solid var(--line);position:sticky;top:0;z-index:50;background:rgba(15,12,6,.92);backdrop-filter:blur(8px)}
-.nav-in{display:flex;align-items:center;justify-content:space-between;height:60px}
-.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:17px}
-.logo i{width:26px;height:26px;border-radius:6px;background:var(--acc);color:var(--onacc);display:inline-flex;align-items:center;justify-content:center;font-size:16px;font-style:normal}
-.nav-links{display:flex;align-items:center;gap:18px;font-size:13.5px;color:var(--mut)}
-.btn{font-weight:600;font-size:13.5px;padding:10px 18px;border-radius:8px;border:none;cursor:pointer;min-height:40px}
-.btn-a{background:var(--acc);color:var(--onacc)}
-.btn-a:hover{background:var(--acc2)}
-.btn-g{background:transparent;color:var(--fg);border:1px solid var(--line)}
-.btn-g:hover{border-color:var(--acc)}
-.btn-d{background:transparent;color:var(--danger);border:1px solid rgba(239,68,68,.5)}
-.btn-sm{padding:7px 13px;font-size:12.5px;min-height:34px}
-select#netSel{background:var(--card);border:1px solid var(--line);border-radius:8px;font-size:12px;padding:9px;color:var(--fg)}
-.hero{padding:56px 0 30px}
-.hero h1{font-size:clamp(30px,5vw,52px);font-weight:800;letter-spacing:-.02em}
-.hero h1 span{color:var(--acc)}
-.hero p{color:var(--mut);max-width:640px;margin-top:12px;font-size:16px}
-.ticker{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden;margin:8px 0 26px}
-.ticker .cell{padding:16px 24px;display:flex;justify-content:space-between;gap:12px}
-.ticker .cell + .cell{border-left:1px solid var(--line)}
-.ticker .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut)}
-.ticker .v{font-size:15px;font-weight:700;color:var(--acc2)}
-.grid{display:grid;grid-template-columns:1.5fr 1fr;gap:18px;align-items:start;padding-bottom:48px}
-@media(max-width:860px){.grid{grid-template-columns:1fr}.ticker{grid-template-columns:1fr}.ticker .cell + .cell{border-left:none;border-top:1px solid var(--line)}}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:14px;margin-bottom:18px;overflow:hidden}
-.panel-head{padding:14px 18px;border-bottom:1px solid var(--line);font-size:11.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--mut)}
-.row{display:grid;grid-template-columns:130px 1fr auto;gap:12px;align-items:center;padding:13px 18px;border-bottom:1px solid var(--line)}
-.row:last-child{border-bottom:none}
-.row label{font-size:11.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut)}
-.row input{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:8px;color:var(--fg);font-size:14px;padding:10px 12px;min-height:42px;font-family:'Inter',sans-serif}
-.kv{display:flex;justify-content:space-between;padding:11px 18px;border-bottom:1px solid var(--line);font-size:13.5px;color:var(--mut);gap:10px}
-.kv:last-child{border-bottom:none}
-.kv b{color:var(--fg);font-weight:600;text-align:right}
-.hint{padding:10px 18px 16px;font-size:12.5px;color:var(--mut)}
-.msg{display:none;padding:8px 18px 14px;font-size:12.5px;color:var(--acc2)}
-.rf{padding:16px 18px;border-bottom:1px solid var(--line)}
-.rf:last-child{border-bottom:none}
-.rf-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:6px;flex-wrap:wrap}
-.rf-top b{font-size:15.5px}
-.tag{font-size:10px;letter-spacing:.1em;text-transform:uppercase;padding:3px 9px;border-radius:5px;border:1px solid;white-space:nowrap}
-.tag.live{color:var(--acc2);border-color:rgba(242,183,5,.5)}
-.tag.done{color:var(--mut);border-color:var(--line)}
-.tag.cancel{color:var(--danger);border-color:rgba(239,68,68,.5)}
-.rf-meta{font-size:12.5px;color:var(--mut);display:flex;gap:14px;flex-wrap:wrap;margin-bottom:10px}
-.rf-meta .mono{color:var(--fg);font-size:12px}
-.rf-actions{display:flex;gap:8px;flex-wrap:wrap}
-footer{padding:36px 0;border-top:1px solid var(--line);color:var(--mut);font-size:13px}
-footer a{color:var(--acc2)}
-.proof{max-width:440px;margin-top:18px;padding:16px 18px;background:var(--card);border:1px solid var(--line);border-radius:8px}
-.proof-title{font-family:ui-monospace,'Courier New',monospace;font-size:11px;font-weight:600;color:var(--acc);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px}
-.proof-grid{display:grid;grid-template-columns:auto 1fr;gap:6px 16px;font-family:ui-monospace,'Courier New',monospace;font-size:12px;color:var(--mut)}
-.proof-grid .val{color:var(--acc);overflow-wrap:anywhere}
-.proof-links{display:flex;gap:14px;flex-wrap:wrap;margin-top:12px}
-.proof-link{font-family:ui-monospace,'Courier New',monospace;font-size:11px;color:var(--acc);border-bottom:1px solid var(--acc);text-decoration:none}
-</style>
-</head>
-<body>
-<nav><div class="wrap nav-in">
-<div class="logo"><i>◉</i>RaffleBox</div>
-<div class="nav-links">
-<select id="netSel"><option value="968" selected>Testnet 968</option><option value="677">Mainnet 677</option></select>
-<button class="btn btn-a" id="connectBtn">Connect wallet</button>
-</div>
-</div></nav>
-
-<div class="wrap">
-<div class="hero">
-<h1>Luck, <span>auditable.</span></h1>
-<p>Raffles drawn from future blockhashes — unpredictable at buy time, verifiable after. Prize + tickets form the pot, winner takes it minus 5%. Missed draw window? Everyone reclaims.</p>
-</div>
-
-<div class="ticker">
-<div class="cell"><span class="k">Raffles</span><span class="v" id="tRaf">—</span></div>
-<div class="cell"><span class="k">Chain block</span><span class="v" id="tBlock">—</span></div>
-<div class="cell"><span class="k">Your BOT</span><span class="v" id="tBal">—</span></div>
-</div>
-
-<div class="grid">
-<div>
-<div class="panel">
-<div class="panel-head">Raffles</div>
-<div id="rafList"><div class="hint">Loading…</div></div>
-</div>
-</div>
-
-<div>
-<div class="panel">
-<div class="panel-head">New raffle</div>
-<div class="row"><label>Prize (BOT)</label><input id="nPrize" type="number" step="any" placeholder="1.0"></div>
-<div class="row"><label>Ticket (BOT)</label><input id="nTicket" type="number" step="any" placeholder="0.1"></div>
-<div class="row"><label>Max tickets</label><input id="nMax" type="number" placeholder="100"></div>
-<div class="row" style="border-bottom:none"><label>Sale (blocks)</label><input id="nSale" type="number" placeholder="500"></div>
-<div class="row" style="border-bottom:none;grid-template-columns:1fr auto"><span class="hint" style="padding:0">Draw block = sale + delay (≤200).</span><button class="btn btn-a" id="createBtn">Create →</button></div>
-<div class="msg" id="cMsg"></div>
-</div>
-
-<div class="panel">
-<div class="panel-head">How it works</div>
-<div class="kv"><span>Tickets</span><b>one per address, exact price</b></div>
-<div class="kv"><span>Draw</span><b>future blockhash, anyone</b></div>
-<div class="kv"><span>Pot</span><b>prize + tickets, −5% fee</b></div>
-<div class="kv"><span>Missed window</span><b>players reclaim tickets</b></div>
-<div class="hint">No VRF needed — the chain itself is the randomness.</div>
-</div>
-</div>
-</div>
-
-<footer>
-<p>RaffleBox — fair raffles on BOT Chain. The block decides.</p>
-<div class="proof">
-<div class="proof-title">Proof on BOT Testnet</div>
-<div class="proof-grid">
-<span>Chain ID</span><span class="val">968</span>
-<span>Contract</span><span class="val">0x57CAAAf1e77D408378808684Cb7dCF8B402a102c</span>
-</div>
-<div class="proof-links">
-<a href="https://botchain.ai" target="_blank" rel="noopener" class="proof-link">BOT Chain Website &#8599;</a>
-<a href="https://scan.bohr.life/" target="_blank" rel="noopener" class="proof-link">BOTScan Explorer &#8599;</a>
-</div>
-</div>
-</footer>
-</div>
-
-<script type="importmap">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>RaffleBox — Fair Raffles on BOT Chain</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Monoton&display=swap" rel="stylesheet"><link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;600;700&display=swap" rel="stylesheet"><style>:root{--bg:#14061a;--fg:#ffeaf6;--mut:#c9a0bb;--line:#43154d;--card:#1f0a29;--acc:#ff3fa4;--acc2:#ffd23f;--onacc:#14061a}@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14061a;--fg:#ffeaf6;--mut:#c9a0bb;--line:#43154d;--card:#1f0a29;--acc:#ff3fa4;--acc2:#ffd23f;--onacc:#14061a}}@media(prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#fff2e0;--fg:#2a0a2e;--mut:#7a4f72;--line:#f0cfa6;--card:#fffaf2;--acc:#c4147a;--acc2:#a56f00;--onacc:#ffffff}}:root[data-theme="dark"]{--bg:#14061a;--fg:#ffeaf6;--mut:#c9a0bb;--line:#43154d;--card:#1f0a29;--acc:#ff3fa4;--acc2:#ffd23f;--onacc:#14061a}:root[data-theme="light"]{--bg:#fff2e0;--fg:#2a0a2e;--mut:#7a4f72;--line:#f0cfa6;--card:#fffaf2;--acc:#c4147a;--acc2:#a56f00;--onacc:#ffffff}*,*:before,*:after{box-sizing:border-box}:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-behavior:smooth;scroll-padding-top:calc(90px + env(safe-area-inset-top,0px))}body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);overflow-x:hidden;-webkit-font-smoothing:antialiased}a{color:inherit;text-decoration:none}button,input,select,textarea{font:inherit;color:inherit}.rv{opacity:0;transform:translateY(40px);transition:1s cubic-bezier(.2,.9,.2,1)}.rv.in{opacity:1;transform:none}.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));translate:-50% 220%;background:var(--fg);color:var(--bg);padding:14px 24px;border-radius:99px;z-index:100;transition:translate .5s cubic-bezier(.2,.9,.2,1);font-size:14px;max-width:90vw;text-align:center}.toast.on{translate:-50% 0}@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.rv{opacity:1;transform:none}}
+:root{--disp:'Monoton',system-ui,sans-serif;--sans:'Lexend',system-ui,sans-serif}
+nav{display:flex;justify-content:space-between;align-items:center;padding:calc(16px + env(safe-area-inset-top,0px)) clamp(16px,4vw,48px) 16px}
+.lg{font-family:var(--disp);font-size:26px;color:var(--acc);text-shadow:0 0 14px color-mix(in srgb,var(--acc) 70%,transparent)}
+.rt{display:flex;gap:10px;align-items:center}.net{display:flex;border:2px solid var(--acc);border-radius:99px;overflow:hidden}.net button{all:unset;cursor:pointer;padding:7px 14px;font-size:13px;font-weight:600}.net .on{background:var(--acc);color:var(--onacc)}
+.cw{all:unset;cursor:pointer;background:var(--acc2);color:#2a0a2e;padding:11px 22px;border-radius:99px;font-weight:700;font-size:14px;box-shadow:0 0 20px color-mix(in srgb,var(--acc2) 50%,transparent)}
+.hero{max-width:1300px;margin:0 auto;padding:10px clamp(16px,4vw,48px) 0;display:grid;grid-template-columns:1.1fr .9fr;gap:clamp(16px,4vw,56px);align-items:center}
+.sign{position:relative;border:6px solid var(--acc2);border-radius:28px;padding:clamp(24px,4vw,48px);background:var(--card);box-shadow:0 0 40px color-mix(in srgb,var(--acc) 25%,transparent),inset 0 0 40px color-mix(in srgb,var(--acc) 12%,transparent)}
+.sign:before,.sign:after{content:"";position:absolute;left:16px;right:16px;height:12px;background:radial-gradient(circle,var(--acc2) 4px,transparent 5px) 0 0/28px 12px;animation:bl 1.2s steps(1) infinite}.sign:before{top:-9px}.sign:after{bottom:-9px;animation-delay:.6s}@keyframes bl{50%{opacity:.25}}
+.sign h1{font-family:var(--disp);font-weight:400;font-size:clamp(46px,7vw,104px);line-height:1;margin:0 0 18px;color:var(--acc);text-shadow:0 0 18px color-mix(in srgb,var(--acc) 70%,transparent)}
+.sign p{font-size:18px;line-height:1.6;color:var(--mut);margin:0 0 24px;max-width:500px}
+.st{display:flex;gap:26px;flex-wrap:wrap}.st b{font-family:var(--disp);font-weight:400;font-size:40px;color:var(--acc2);display:block;line-height:1}.st span{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}
+.dr{position:relative;max-width:480px;width:100%;margin:0 auto}.dr canvas{width:100%;aspect-ratio:1;display:block}.dr .wn{position:absolute;left:0;right:0;bottom:-6px;text-align:center;font-weight:700;color:var(--acc2);min-height:24px;font-size:15px}
+.sec{max-width:1300px;margin:0 auto;padding:clamp(48px,7vw,90px) clamp(16px,4vw,48px) 0}.sec h2{font-family:var(--disp);font-weight:400;font-size:clamp(32px,5vw,64px);margin:0 0 28px;color:var(--acc2);text-shadow:0 0 16px color-mix(in srgb,var(--acc2) 55%,transparent)}
+.rs{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:26px}
+.tk{position:relative;background:var(--card);border-radius:20px;padding:26px 26px 22px;border:2px solid var(--line);-webkit-mask:radial-gradient(circle 14px at 0 62%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 14px at 100% 62%,transparent 98%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 14px at 0 62%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 14px at 100% 62%,transparent 98%,#000) right/51% 100% no-repeat;cursor:pointer;transition:.3s}.tk.sel{border-color:var(--acc);box-shadow:0 0 30px color-mix(in srgb,var(--acc) 35%,transparent)}
+.tk h4{font-family:var(--disp);font-weight:400;font-size:34px;margin:0;color:var(--acc2)}.tk .tag{display:inline-block;border:2px solid var(--acc);color:var(--acc);border-radius:99px;padding:2px 12px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;float:right}
+.tk dl{display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;margin:20px 0;border-top:2px dashed var(--line);padding-top:18px}.tk dt{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--mut)}.tk dd{margin:2px 0 0;font-weight:700;font-size:17px}
+.bar{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin-bottom:16px}.bar i{display:block;height:100%;background:linear-gradient(90deg,var(--acc),var(--acc2))}
+.ac{display:flex;gap:8px;flex-wrap:wrap}.ac button{all:unset;cursor:pointer;padding:10px 20px;border-radius:99px;border:2px solid var(--acc);color:var(--acc);font-weight:700;font-size:13px}.ac .p{background:var(--acc);color:var(--onacc)}.ac button:hover{filter:brightness(1.15)}
+.nw{display:grid;grid-template-columns:repeat(5,1fr) auto;gap:14px;align-items:end;border:3px solid var(--acc);border-radius:28px;padding:clamp(20px,3vw,34px);background:var(--card)}.nw label{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--mut);font-weight:600}.nw input{all:unset;display:block;width:100%;box-sizing:border-box;border-bottom:2px solid var(--acc);padding:8px 0;font-size:19px;margin-top:4px;font-weight:600}
+.go{all:unset;cursor:pointer;background:var(--acc);color:var(--onacc);padding:14px 26px;border-radius:99px;font-weight:700}
+.hw{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}.hw div{border:2px solid var(--line);border-radius:22px;padding:24px;background:var(--card)}.hw span{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--acc);font-weight:700}.hw b{display:block;font-family:var(--disp);font-weight:400;font-size:23px;margin:10px 0 8px;color:var(--acc2)}.hw p{margin:0;color:var(--mut);line-height:1.5;font-size:14px}
+footer{max-width:1300px;margin:80px auto 0;padding:28px clamp(16px,4vw,48px);display:flex;flex-wrap:wrap;gap:14px;justify-content:space-between;color:var(--mut);font-size:13px}
+@media(max-width:900px){.hero,.nw,.hw{grid-template-columns:1fr}.net{display:none}}
+</style></head><body>
+<nav><a class="lg" href="#">RaffleBox</a><div class="rt"><div class="net"><button class="on">Testnet 968</button><button>Mainnet 677</button></div><button class="cw" id="w">Connect wallet</button></div></nav>
+<header class="hero"><div class="sign"><h1>Luck, auditable.</h1><p>Raffles drawn from future blockhashes: unpredictable at buy time, verifiable after. Prize plus tickets form the pot, and the winner takes it minus 5%. Missed the draw window? Everyone reclaims.</p><div class="st"><div><b id="k1">0</b><span>Raffles</span></div><div><b id="k2">0</b><span>Chain block</span></div><div><b id="k3">0</b><span>Your BOT</span></div></div></div>
+<div class="dr"><canvas id="dm" width="520" height="520"></canvas><div class="wn" id="wn"></div></div></header>
+<section class="sec" id="rs"><h2>Raffles</h2><div class="rs" id="rl"></div></section>
+<section class="sec"><h2>New raffle</h2><div class="nw"><label>Prize (BOT)<input id="n1" value="100" inputmode="decimal"></label><label>Ticket (BOT)<input id="n2" value="5" inputmode="decimal"></label><label>Max tickets<input id="n3" value="20" inputmode="numeric"></label><label>Sale (blocks)<input id="n4" value="60" inputmode="numeric"></label><label>Delay (blocks)<input id="n5" value="30" inputmode="numeric"></label><button class="go" id="n6">Create →</button></div><p style="color:var(--mut);margin:12px 4px 0;font-size:13px">Draw block = sale + delay (≤ 200).</p></section>
+<section class="sec"><h2>How it works</h2><div class="hw"><div><span>Tickets</span><b>One per address</b><p>Exact price, one ticket per address.</p></div><div><span>Draw</span><b>Future blockhash</b><p>Anyone can trigger it once the draw block arrives.</p></div><div><span>Pot</span><b>Prize + tickets, −5%</b><p>The winner takes the pot minus a 5% fee.</p></div><div><span>Missed window</span><b>Players reclaim</b><p>If nobody draws in time, tickets are refunded.</p></div></div><p style="font-size:19px;margin:26px 0 0;max-width:640px;color:var(--mut)">No VRF needed. The chain itself is the randomness.</p></section>
+<footer><span>RaffleBox — fair raffles on BOT Chain. The block decides.</span><span>Proof on BOT Testnet · chain 968 · 0x57CA…102c · <a href="https://botchain.ai" target="_blank" rel="noopener" style="color:var(--acc);text-decoration:underline">BOT Chain Website &#8599;</a> · <a href="https://scan.bohr.life/" target="_blank" rel="noopener" style="color:var(--acc);text-decoration:underline">BOTScan &#8599;</a></span></footer>
+<div class="toast" id="toast"></div><script type="importmap">
 {"imports":{"ethers":"https://esm.sh/ethers@6.13.2","@reown/appkit":"https://esm.sh/@reown/appkit@1.8.21","@reown/appkit-adapter-ethers":"https://esm.sh/@reown/appkit-adapter-ethers@1.8.21"}}
 </script>
 <script type="module">
 import { ethers } from 'ethers';
 import { createAppKit } from '@reown/appkit';
 import { EthersAdapter } from '@reown/appkit-adapter-ethers';
-
-const PROJECT_ID = 'f018499b1e4a94d961ab67aeeeff3254';
-const CONTRACTS = { 968: { rb: '0x57CAAAf1e77D408378808684Cb7dCF8B402a102c' } };
-const RB_ABI = ['function totalRaffles() view returns (uint256)','function getRaffle(uint256) view returns (address,uint256,uint256,uint256,uint64,uint64,uint256,bool,bool,address)','function potOf(uint256) view returns (uint256)','function create(uint256,uint256,uint64,uint64) payable returns (uint256)','function buy(uint256) payable','function draw(uint256)','function reclaim(uint256)','function cancel(uint256)'];
-const $ = (id) => document.getElementById(id);
-let currentChainId = 968, account = null;
-
-const appkit = createAppKit({
-  adapters: [new EthersAdapter()],
-  networks: [{ id: 677, name: 'BOT Mainnet', nativeCurrency: { name: 'BOT', symbol: 'BOT', decimals: 18 }, rpcUrls: { default: { http: ['https://rpc.botchain.ai'] } } }, { id: 968, name: 'BOT Testnet', nativeCurrency: { name: 'BOT', symbol: 'BOT', decimals: 18 }, rpcUrls: { default: { http: ['https://rpc.bohr.life'] } } }],
-  projectId: PROJECT_ID,
-  features: { analytics: false },
-});
-async function getSigner() {
-  if (typeof appkit !== 'undefined' && appkit && typeof appkit.getWalletProvider === 'function') {
-    const wp = appkit.getWalletProvider('eip155') || appkit.getWalletProvider();
-    if (wp) return await new ethers.BrowserProvider(wp).getSigner();
-  }
-  throw new Error('Connect a wallet first');
-}
-function short(a) { return !a || a === ethers.ZeroAddress ? '—' : a.slice(0, 6) + '…' + a.slice(-4); }
-function msg(id, t, ok) {
-  const el = $(id); el.style.display = 'block';
-  el.style.color = ok === false ? 'var(--danger)' : 'var(--acc2)';
-  el.textContent = t;
-}
-async function provider() {
-  return new ethers.JsonRpcProvider(currentChainId === 968 ? 'https://rpc.bohr.life' : 'https://rpc.botchain.ai');
-}
-async function rbRead() {
-  const c = CONTRACTS[currentChainId];
-  if (!c) return null;
-  return new ethers.Contract(c.rb, RB_ABI, await provider());
-}
-function fmt(v) { try { return ethers.formatEther(v); } catch (e) { return String(v); } }
-async function refresh() {
-  const t = await rbRead();
-  const p = await provider();
-  const blk = await p.getBlockNumber();
-  $('tBlock').textContent = blk.toLocaleString();
-  if (!t) { $('rafList').innerHTML = '<div class="hint">Mainnet not deployed yet — testnet for now.</div>'; $('tRaf').textContent = '—'; return; }
-  const n = Number(await t.totalRaffles());
-  $('tRaf').textContent = n;
-  if (account) {
-    try { $('tBal').textContent = Number(ethers.formatEther(await p.getBalance(account))).toFixed(4) + ' BOT'; } catch (e) {}
-  }
-  let html = '';
-  for (let i = n - 1; i >= 0; i--) {
-    const r = await t.getRaffle(i);
-    const pot = await t.potOf(i);
-    const status = r[7] ? ['done', r[9] !== ethers.ZeroAddress ? 'Won by ' + short(r[9]) : 'Drawn'] : r[8] ? ['cancel', 'Expired'] : blk < Number(r[4]) ? ['live', 'Selling'] : blk < Number(r[5]) ? ['live', 'Awaiting draw'] : ['cancel', 'Drawable'];
-    html += '<div class="rf"><div class="rf-top"><b>Raffle #' + i + ' · pot ' + fmt(pot) + ' BOT</b><span class="tag ' + status[0] + '">' + status[1] + '</span></div>'
-      + '<div class="rf-meta"><span>Ticket <span class="mono">' + fmt(r[2]) + '</span></span><span>Players <span class="mono">' + r[6] + '/' + r[3] + '</span></span><span>Draw block <span class="mono">' + r[5] + '</span></span></div>'
-      + '<div class="rf-actions">'
-      + (!r[7] && !r[8] && blk < Number(r[4]) ? '<button class="btn btn-a btn-sm" data-act="buy" data-id="' + i + '">Buy ticket (' + fmt(r[2]) + ')</button>' : '')
-      + (!r[7] && !r[8] && blk >= Number(r[5]) ? '<button class="btn btn-g btn-sm" data-act="draw" data-id="' + i + '">Draw</button>' : '')
-      + (r[8] && !r[7] ? '<button class="btn btn-g btn-sm" data-act="reclaim" data-id="' + i + '">Reclaim ticket</button>' : '')
-      + '</div></div>';
-  }
-  $('rafList').innerHTML = html || '<div class="hint">No raffles yet — create the first one →</div>';
-}
-async function write(fn, args, value, okMsg) {
-  try {
-    const s = await getSigner();
-    const t = new ethers.Contract(CONTRACTS[currentChainId].rb, RB_ABI, s);
-    const tx = value !== undefined ? await t[fn](...args, { value }) : await t[fn](...args);
-    msg('cMsg', 'Sent: ' + tx.hash.slice(0, 18) + '… waiting…');
-    await tx.wait();
-    msg('cMsg', okMsg || 'Confirmed ✓');
-    await refresh();
-  } catch (e) {
-    msg('cMsg', 'Failed: ' + (e.shortMessage || e.reason || e.message || e).toString().slice(0, 160), false);
-  }
-}
-$('rafList').addEventListener('click', async (e) => {
-  const b = e.target.closest('[data-act]'); if (!b) return;
-  const id = Number(b.dataset.id);
-  const t = await rbRead();
-  if (b.dataset.act === 'buy') {
-    const r = await t.getRaffle(id);
-    await write('buy', [id], r[2], 'Ticket bought ✓ good luck.');
-  } else if (b.dataset.act === 'draw') {
-    await write('draw', [id], undefined, 'Drawn ✓ winner paid.');
-  } else if (b.dataset.act === 'reclaim') {
-    await write('reclaim', [id], undefined, 'Ticket refunded.');
-  }
-});
-$('createBtn').addEventListener('click', async () => {
-  const prize = $('nPrize').value.trim(), tick = $('nTicket').value.trim();
-  const max = Number($('nMax').value.trim() || '0'), sale = Number($('nSale').value.trim() || '0');
-  if (!prize || Number(prize) < 0 || !tick || Number(tick) <= 0 || !(max > 1) || !(sale > 0)) {
-    msg('cMsg', 'Ticket price + max>1 + sale blocks required (prize may be 0).', false); return;
-  }
-  await write('create', [ethers.parseEther(tick), max, sale, 10], ethers.parseEther(prize || '0'), 'Raffle created ✓ tickets on sale.');
-});
-if ($('connectBtn')) {
-  appkit.subscribeAccount((a) => {
-    account = a.address || null;
-    $('connectBtn').textContent = account ? account.slice(0, 6) + '…' + account.slice(-4) : 'Connect wallet';
-    refresh();
-  });
-  appkit.subscribeNetwork((n) => {
-    if (n && n.chainId) { currentChainId = Number(n.chainId); const s = $('netSel'); if (s) s.value = String(currentChainId); }
-    refresh();
-  });
-  $('connectBtn').addEventListener('click', () => appkit.open());
-  if ($('netSel')) $('netSel').addEventListener('change', (e) => {
-    const id = Number(e.target.value);
-    try { appkit.switchNetwork({ id }); } catch (err) {}
-    currentChainId = id;
-    refresh();
-  });
-}
-refresh();
-setInterval(() => { if (!document.hidden) refresh(); }, 20000);
+const PROJECT_ID='f018499b1e4a94d961ab67aeeeff3254';
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)],tok=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim(),rnd=(a,b)=>a+Math.random()*(b-a),fmt=(n,d=0)=>Number(n).toLocaleString('en-US',{minimumFractionDigits:d,maximumFractionDigits:d});
+let _t;function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('on');clearTimeout(_t);_t=setTimeout(()=>t.classList.remove('on'),2600)}
+function count(el,to,d=0){const f=+el.dataset.v||0;el.dataset.v=to;const t0=performance.now();(function s(t){const k=Math.min(1,(t-t0)/700);el.textContent=fmt(f+(to-f)*k,d);if(k<1)requestAnimationFrame(s)})(t0)}
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.08});$$('.rv').forEach(e=>io.observe(e));
+const NETS={677:{rpc:'https://rpc.botchain.ai'},968:{rpc:'https://rpc.bohr.life'}};
+const CA={677:null,968:'0x57CAAAf1e77D408378808684Cb7dCF8B402a102c'};
+const ABI=['function totalRaffles() view returns (uint256)','function getRaffle(uint256) view returns (address,uint256,uint256,uint256,uint64,uint64,uint256,bool,bool,address)','function hasTicket(uint256,address) view returns (bool)','function potOf(uint256) view returns (uint256)','function create(uint256,uint256,uint64,uint64) payable returns (uint256)','function buy(uint256) payable','function draw(uint256)','function reclaim(uint256)','function cancel(uint256)','function playerAt(uint256,uint256) view returns (address)'];
+let currentChainId=968,account=null,R=[],blk=0,sel=0,win=null,spinT=0;
+const appkit=createAppKit({adapters:[new EthersAdapter()],networks:[{id:968,name:'BOT Testnet',nativeCurrency:{name:'BOT',symbol:'BOT',decimals:18},rpcUrls:{default:{http:[NETS[968].rpc]}}},{id:677,name:'BOT Mainnet',nativeCurrency:{name:'BOT',symbol:'BOT',decimals:18},rpcUrls:{default:{http:[NETS[677].rpc]}}}],projectId:PROJECT_ID,features:{analytics:false}});
+async function getSigner(){if(typeof appkit!=='undefined'&&appkit&&typeof appkit.getWalletProvider==='function'){const wp=appkit.getWalletProvider('eip155')||appkit.getWalletProvider();if(wp)return await new ethers.BrowserProvider(wp).getSigner()}throw new Error('Connect a wallet first')}
+function provider(){return new ethers.JsonRpcProvider(NETS[currentChainId].rpc)}
+function read(){return CA[currentChainId]?new ethers.Contract(CA[currentChainId],ABI,provider()):null}
+async function write(fn,args,value){if(!CA[currentChainId])throw new Error('Not deployed on mainnet yet — switch to Testnet 968');const s=await getSigner();const c=new ethers.Contract(CA[currentChainId],ABI,s);return value!==undefined?await c[fn](...args,{value}):await c[fn](...args)}
+async function refresh(){const t=read();if(!t){R=[];return ui()}try{blk=await provider().getBlockNumber();const n=Number(await t.totalRaffles());const list=[];for(let i=0;i<n;i++){const g=await t.getRaffle(i);const pot=await t.potOf(i);let mine=false,wIdx=-1;if(account)mine=await t.hasTicket(i,account);if(g[7]){for(let j=0;j<Number(g[6]);j++){try{const p=await t.playerAt(i,j);if(p.toLowerCase()===g[9].toLowerCase()){wIdx=j;break}}catch(e){break}}}list.push({id:i,org:g[0],prize:g[1],price:g[2],max:Number(g[3]),close:Number(g[4]),settle:Number(g[5]),n:Number(g[6]),drawn:g[7],expired:g[8],winner:g[9],pot,mine,wIdx})}R=list}catch(e){}}
+const short=a=>!a?'—':a.slice(0,6)+'…'+a.slice(-4);
+const stt=r=>r.drawn?'Drawn':r.expired?'Missed':blk>=r.settle?(r.n?'Draw open':'Draw window, no players'):blk>=r.close?'Sale closed':blk<r.close?'On sale':'Sale closed';
+const payout=r=>r.pot*9500n/10000n;
+function ui(){$('#k1').textContent=R.length;$('#k2').textContent=fmt(blk);if(account)provider().getBalance(account).then(b=>{$('#k3').textContent=fmt(+ethers.formatEther(b),3)});else $('#k3').textContent='—';
+$('#rl').innerHTML=R.map((r,i)=>{const s=stt(r);let a='';if(s==='On sale'&&!r.mine&&r.n<r.max)a+=`<button class="p" data-a="buy" data-i="${i}">Buy ticket · ${fmt(+ethers.formatEther(r.price),4)} BOT</button>`;if(s==='Draw open')a+=`<button class="p" data-a="draw" data-i="${i}">Draw winner</button>`;if(r.expired&&r.mine)a+=`<button class="p" data-a="reclaim" data-i="${i}">Reclaim ticket</button>`;if(!r.drawn&&!r.expired&&r.n===0&&account&&r.org.toLowerCase()===account.toLowerCase())a+=`<button data-a="cancel" data-i="${i}">Cancel (refund prize)</button>`;
+return `<div class="tk ${i==sel?'sel':''}" data-i="${i}"><span class="tag">${s}</span><h4>${fmt(+ethers.formatEther(r.prize))} BOT</h4><dl><div><dt>Ticket</dt><dd>${fmt(+ethers.formatEther(r.price),4)} BOT</dd></div><div><dt>Sold</dt><dd>${r.n} / ${r.max}${r.mine?' · yours':''}</dd></div><div><dt>Sale ends</dt><dd>block ${fmt(r.close)}</dd></div><div><dt>Draw block</dt><dd>${fmt(r.settle)}</dd></div></dl><div class="bar"><i style="width:${r.max?r.n/r.max*100:0}%"></i></div>${r.drawn?`<p style="margin:0;font-weight:700">Winner ${short(r.winner)} took ${fmt(+ethers.formatEther(payout(r)),4)} BOT</p>`:`<div class="ac">${a||'<span style="color:var(--mut);font-size:13px">Nothing to do right now</span>'}</div>`}</div>`}).join('')||'<p style="color:var(--mut);font-weight:700">No raffles yet — create the first one</p>'}
+async function run(fn,args,value,ok){try{toast('Sending…');const tx=await write(fn,args,value);toast('Sent '+tx.hash.slice(0,14)+'…');await tx.wait();toast(ok);await refresh();ui()}catch(e){toast('Failed: '+(e.shortMessage||e.message||e).toString().slice(0,140))}}
+$('#rl').onclick=async e=>{const c=e.target.closest('.tk');if(!c)return;const i=+c.dataset.i;sel=i;const b=e.target.closest('button');if(b){const a=b.dataset.a;const r=R[i];if(a==='buy')await run('buy',[i],r.price,'Ticket bought for exactly '+fmt(+ethers.formatEther(r.price),4)+' BOT');else if(a==='reclaim')await run('reclaim',[i],undefined,'Ticket reclaimed');else if(a==='cancel')await run('cancel',[i],undefined,'Raffle cancelled — prize returned');else if(a==='draw'){win=null;spinT=performance.now();await run('draw',[i],undefined,'Drawn from the blockhash of block '+fmt(r.settle));const nr=R[i];if(nr&&nr.drawn){const wIdx=nr.wIdx>=0?nr.wIdx:0;win={n:wIdx+1,w:nr.winner,p:payout(nr)}}}}ui()};
+$('#n6').onclick=()=>{const p=$('#n1').value,t=$('#n2').value,m=+$('#n3').value,s=+$('#n4').value,d=+$('#n5').value;if(!(+p>0&&+t>0&&m>1&&s>0&&d>0))return toast('Check the numbers');if(d>200)return toast('Delay must be ≤ 200 blocks');run('create',[ethers.parseEther(t),m,s,d],ethers.parseEther(p),'Raffle created. Tickets are on sale.')};
+$$('.net button').forEach((b,i)=>b.onclick=async()=>{const id=i===0?968:677;try{await appkit.switchNetwork({id})}catch(e){}currentChainId=id;$$('.net button').forEach(x=>x.classList.toggle('on',x===b));toast('Switched to '+b.textContent);await refresh();ui()});
+$('#w').onclick=()=>appkit.open();
+appkit.subscribeAccount(a=>{account=a.address||null;$('#w').textContent=account?account.slice(0,6)+'…'+account.slice(-4):'Connect wallet';refresh().then(ui)});
+appkit.subscribeNetwork(n=>{if(n&&n.chainId){currentChainId=Number(n.chainId);$$('.net button').forEach((x,i)=>x.classList.toggle('on',(i===0&&currentChainId===968)||(i===1&&currentChainId===677)));refresh().then(ui)}});
+const c=$('#dm'),g=c.getContext('2d'),Rr=250;let B=[],last=-1;
+function balls(){const n=Math.min(24,Math.max(R[sel]?R[sel].n:6,6));B=[...Array(n)].map((_,i)=>({x:260+rnd(-100,100),y:260+rnd(-100,100),vx:rnd(-3,3),vy:rnd(-3,3),n:i+1}))}
+balls();
+(function d(t){if(last!=sel+':'+(R[sel]?R[sel].n:0)){last=sel+':'+(R[sel]?R[sel].n:0);balls()}g.clearRect(0,0,520,520);const ac=tok('--acc'),a2=tok('--acc2'),cd=tok('--card');g.lineWidth=8;g.strokeStyle=a2;g.fillStyle=cd;g.beginPath();g.arc(260,260,Rr,0,7);g.fill();g.stroke();g.lineWidth=2;g.strokeStyle=ac;g.beginPath();g.arc(260,260,Rr-14,0,7);g.stroke();
+const sp=win&&t-spinT<2800,wd=win&&!sp;B.forEach(b=>{b.vy+=sp?0:.16;if(sp){const dx=b.x-260,dy=b.y-260;b.vx+=-dy*.0016;b.vy+=dx*.0016;b.vx+=rnd(-.4,.4);b.vy+=rnd(-.4,.4)}b.x+=b.vx;b.y+=b.vy;const dx=b.x-260,dy=b.y-260,dist=Math.hypot(dx,dy);if(dist>Rr-34){const nx=dx/dist,ny=dy/dist,dp=b.vx*nx+b.vy*ny;b.vx=(b.vx-2*dp*nx)*.94;b.vy=(b.vy-2*dp*ny)*.94;b.x=260+nx*(Rr-34);b.y=260+ny*(Rr-34)}b.vx*=.995;
+const hit=wd&&b.n==win.n;g.fillStyle=hit?a2:(b.n%2?ac:cd);g.strokeStyle=a2;g.lineWidth=3;g.beginPath();g.arc(b.x,b.y,hit?26:22,0,7);g.fill();g.stroke();g.fillStyle=hit||b.n%2?'#2a0a2e':tok('--fg');g.font='700 16px Lexend,sans-serif';g.textAlign='center';g.fillText(b.n,b.x,b.y+6)});
+$('#wn').textContent=wd?'Ball #'+win.n+' · '+short(win.w)+' takes '+fmt(+ethers.formatEther(win.p),4)+' BOT':sp?'Drawing…':'Tap a raffle to load its drum';requestAnimationFrame(d)})(0);
+refresh().then(ui);setInterval(()=>{if(!document.hidden)refresh().then(ui)},8000);
 </script>
-</body>
-</html>
+</body></html>
